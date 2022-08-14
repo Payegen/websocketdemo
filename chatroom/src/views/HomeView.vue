@@ -18,6 +18,12 @@
           <input type="text" placeholder="搜索">
           <button>+</button>
         </li>
+
+        <li>
+          <img src="@/assets/logo.png" alt="">
+          <span>用户：{{username}}</span>
+        </li>
+        <li></li>
         <li></li>
       </ul>
     </section>
@@ -26,12 +32,15 @@
       <h1>聊天室</h1>
 
       <div :class="$['neirong']">
-      
+        <ul>
+          <li>1</li>
+
+        </ul>
       </div>
 
       <p :class="$['shuru']">
-      <textarea name="" id="" cols="30" rows="10"></textarea>
-      <button>发送</button>
+      <textarea name="" id="" cols="30" rows="10"  v-model="message"></textarea>
+      <button @click="sendall">发送</button>
       </p>
     </section>
   </div>
@@ -43,9 +52,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue ,Watch} from 'vue-property-decorator';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import Ws from '@/socket/ws'
+import { nextTick } from 'vue';
 
 @Component({
   components: {
@@ -54,24 +64,40 @@ import Ws from '@/socket/ws'
 })
 export default class HomeView extends Vue {
 
-  username='';
+  username:any;
   message='';
-  mymessage='h1'
+  mymessage:string='h1'
   count:number=0;
   ws?:Ws;
 
+@Watch('mys')
+
   created(){
-    this.count++
+    // this.count++
     this.ws = new Ws()
-    this.ws.init()
+    // this.ws.init()
+    this.username = this.$route.query.uname
+    setTimeout(() => {
+     this.login()
+     console.log('初始化完成');
+    }, 0);
   }
+
+@Watch('ws.msg')
+test(val:string,old:string){
+  console.log('bainhuale'+val); 
+}
 
   login(){
     this.ws!.login(this.username)
   }
   sendall(){
     this.ws?.sendall(this.message)
-    this.mymessage = this.ws!.msg
+     this.mymessage = this.ws!.msg
+      console.log('发送的信息为'+this.mymessage);
+      
+    this.$nextTick(
+    )
   }
   // sendmsg(){
   //   this.ws!.send(JSON.stringify({
@@ -120,6 +146,7 @@ export default class HomeView extends Vue {
       width: 100%;
       display: inline-block;
       &>li:first-child{
+        display: block;
         margin-top: 0;
         background-color: rgb(247,247,247);
         input{
@@ -127,7 +154,7 @@ export default class HomeView extends Vue {
           border-radius: 5px;
           border: none;
           height: 25px;
-          margin:{
+          margin: {
             top: 35px;
             right: 10px;
           }
@@ -144,9 +171,21 @@ export default class HomeView extends Vue {
       }
       li{
         height: 70px;
-        background-color: pink;
+        // background-color: pink;
         border:1px solid;
         margin: 1px 0;
+        display: flex;
+
+        img{
+          height: 50px;
+          width: 50px;
+          margin: 10px;
+        }
+
+        span{
+          line-height: 40px;
+          margin-left: 10px;
+        }
       }
     }
   }

@@ -16,7 +16,7 @@ class Ws{
         let that = this
         this.ws.onmessage = function (e) {
             console.log('from server: ' + e.data);
-            console.error(e.data)
+            // console.error(e.data)
             that.msg = e.data
         };
     }
@@ -27,6 +27,12 @@ class Ws{
                 msg:data
             }));
         }
+        let that = this
+        this.ws.onmessage = function (e) {
+            console.log('from server: ' + e.data);
+            // console.error(e.data)
+            that.msg = e.data
+        };
     }
     p2p(to:string,data:string){
         if(this.ws.readyState===WebSocket.OPEN){

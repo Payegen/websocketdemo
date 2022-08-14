@@ -20,6 +20,10 @@ wss.on('connection',(socket,req)=>{
             case 'all':
                 wss.clients.forEach( client =>{
                     client.send(data.msg)
+                    JSON.stringify({
+                        type:"all",
+                        msg:data.msg
+                    })
                 })
                 console.log('这是一条广播消息'+data.msg);
                 console.log('客户端的长度为'+wss.clients.size);
