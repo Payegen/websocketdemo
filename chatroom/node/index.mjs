@@ -2,31 +2,39 @@ import {WebSocketServer} from 'ws'
 
 const wss = new WebSocketServer({port:8088});
 let count = 0;
-let users = {
-};
+let users = {};
 wss.on('connection',(socket,req)=>{
     count++
     socket.onmessage = function(e){
         let data = JSON.parse(e.data)
         switch (data.type) {
             case "login":
+                console.log('-------注册bgein--------');
                 if(!users[data.name]){
                     users[data.name] = socket
-                    socket.send('注册成功')
+                    socket.send(JSON.stringify({
+                        type:'login',
+                        code:1,
+                        msg:`${data.name}注册成功`
+                    }))
                 }else{
-                    socket.send('该用户已存在')
+                    socket.send(JSON.stringify({
+                        type:'login',
+                        code:0,
+                        msg:'用户已存在'
+                    }))
                 }
+                console.log('-------注册end--------');
                 break;
             case 'all':
                 wss.clients.forEach( client =>{
-                    client.send(data.msg)
-                    JSON.stringify({
+                    client.send(JSON.stringify({
                         type:"all",
+                        from:data.from,
                         msg:data.msg
-                    })
+                    }))
+                    
                 })
-                console.log('这是一条广播消息'+data.msg);
-                console.log('客户端的长度为'+wss.clients.size);
                 break;
             case 'p2p':
 
@@ -38,7 +46,12 @@ wss.on('connection',(socket,req)=>{
         console.log(e.data);
         // console.log(users);
     }
-    socket.send("恭喜连接成功")
+    // socket.send(JSON.stringify({
+    //     type:"all",
+    //     from:data.name,
+    //     msg:""
+    // }))
+    console.log(users);
 })
 wss.on('error',(e)=>{
     console.log(e.message);

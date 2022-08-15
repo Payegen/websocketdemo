@@ -1,10 +1,11 @@
 class Ws{
     ws:WebSocket;
 
-    msg:string = '';
+    allmsg:any[]=[];
     
     constructor(){
        this.ws = new WebSocket('ws://localhost:8088');
+       this.init();
     }
     init(){
         this.ws.onopen = function () {
@@ -15,24 +16,42 @@ class Ws{
         };
         let that = this
         this.ws.onmessage = function (e) {
-            console.log('from server: ' + e.data);
-            // console.error(e.data)
-            that.msg = e.data
+            let data = JSON.parse(e.data)
+
+            switch (data.type) {
+                case 'all':
+                    that.allmsg.push({ 
+                        name : data.from,
+                        msg : data.msg
+                    })
+                    break;
+                case 'login':
+                    if(data.code===0){
+                        console.error(data.msg)
+                    }
+                    else{
+                        console.log(data.msg);
+                    }
+                    break;
+                default:
+                    break;
+            }
         };
     }
-    sendall(data:string){
+    sendall(name:string,data:string){
         if(this.ws.readyState===WebSocket.OPEN){
             this.ws.send(JSON.stringify({
                 type:'all',
+                from:name,
                 msg:data
             }));
         }
         let that = this
-        this.ws.onmessage = function (e) {
-            console.log('from server: ' + e.data);
-            // console.error(e.data)
-            that.msg = e.data
-        };
+        // this.ws.onmessage = function (e) {
+        //     console.log('from server: ' + e.data);
+        //     // console.error(e.data)
+        //     that.msg = e.data
+        // };
     }
     p2p(to:string,data:string){
         if(this.ws.readyState===WebSocket.OPEN){
@@ -50,6 +69,9 @@ class Ws{
                 name:name
             }));
         }
+    }
+    close(){
+        this.ws.close()
     }
 }
 export default Ws;

@@ -13,11 +13,8 @@ import Ws from "@/socket/ws";
 export default class Login extends Vue {
 
   username='';
-  ws?:Ws;
 
   created(){
-    // this.ws = new Ws()
-    // this.ws.init()
   }
  login(){
     // this.ws!.login(this.username)

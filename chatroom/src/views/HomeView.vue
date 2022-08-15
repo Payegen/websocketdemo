@@ -33,7 +33,11 @@
 
       <div :class="$['neirong']">
         <ul>
-          <li>1</li>
+          <li v-for="(item,index) in allmessages" :key="index" :class="item.name===username? $['remsglist']:$['msglist']">
+          <img src="@/assets/wx.jpg" alt="">
+          <h5>用户：{{item.name}}</h5>
+          <span>{{item.msg}}</span>
+          </li>
 
         </ul>
       </div>
@@ -45,8 +49,6 @@
     </section>
   </div>
 
-
-  <h1>{{mymessage}}</h1>
 
   </div>
 </template>
@@ -66,7 +68,7 @@ export default class HomeView extends Vue {
 
   username:any;
   message='';
-  mymessage:string='h1'
+  allmessages:any[]=new Array();
   count:number=0;
   ws?:Ws;
 
@@ -77,13 +79,14 @@ export default class HomeView extends Vue {
     this.ws = new Ws()
     // this.ws.init()
     this.username = this.$route.query.uname
-    setTimeout(() => {
-     this.login()
-     console.log('初始化完成');
-    }, 0);
+    this.allmessages = this.ws.allmsg
+    this.$nextTick(()=>{
+      this.login()
+    }
+    )
   }
 
-@Watch('ws.msg')
+@Watch('ws')
 test(val:string,old:string){
   console.log('bainhuale'+val); 
 }
@@ -91,25 +94,14 @@ test(val:string,old:string){
   login(){
     this.ws!.login(this.username)
   }
+
   sendall(){
-    this.ws?.sendall(this.message)
-     this.mymessage = this.ws!.msg
-      console.log('发送的信息为'+this.mymessage);
-      
+    this.ws?.sendall(this.username,this.message)
+    this.allmessages = this.ws!.allmsg
     this.$nextTick(
     )
   }
-  // sendmsg(){
-  //   this.ws!.send(JSON.stringify({
-  //     msg:'woshidi'+this.count
-  //   }))
-  // }
-  // sendall(){
-  //   this.ws?.send(JSON.stringify({
-  //     type:'all',
-  //     msg:'wo 广播 给大家'
-  //   }))
-  // }
+
 }
 </script>
 
@@ -181,7 +173,7 @@ test(val:string,old:string){
           width: 50px;
           margin: 10px;
         }
-
+  
         span{
           line-height: 40px;
           margin-left: 10px;
@@ -205,7 +197,82 @@ test(val:string,old:string){
     .neirong{
       flex: 3;
       background: white;
-      
+      overflow: auto;
+      .msglist{
+        height: 40px;
+        background-color: aqua;
+        margin-bottom: 3px;
+        img{
+          height: 30px;
+          width: 30px;
+          margin: 5px;
+          float: left;
+        }
+        h5{
+          float: left;
+          margin-left: 5px;
+        }
+        span{
+          background-color: white;
+          float: left;
+          height: 30px;
+          margin: 5px 10px;
+          padding: 1px 7px;
+         
+          z-index: 1;
+          position: relative;
+          &::after{
+            position: absolute;
+            content: "";
+            display: block;
+            background-color: white;
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            top: 2px;
+            left: -5px;
+            z-index: 0;
+          }
+        }
+      }
+        .remsglist{
+        height: 40px;
+        background-color: aqua;
+        margin-bottom: 3px;
+        img{
+          height: 30px;
+          width: 30px;
+          margin: 5px;
+          float: right;
+        }
+        h5{
+          float: right;
+          margin-left: 5px;
+        }
+        span{
+          background-color: white;
+          float: right;
+          height: 30px;
+          padding: 1px 7px;
+          margin: 5px;
+          z-index: 1;
+          position: relative;
+          &::after{
+            position: absolute;
+            content: "";
+            display: block;
+            background-color: white;
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            top: 2px;
+            right: -5px;
+            z-index: 0;
+          }
+        }
+        
+      }
+
     }
     .shuru{
       flex: 1;
